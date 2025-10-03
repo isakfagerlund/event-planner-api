@@ -105,6 +105,7 @@ scheduleSlotRoutes.openapi(
     path: '/',
     tags: ['Event Schedule Slots'],
     summary: 'List schedule slots',
+    security: [{ bearerAuth: [] }],
     responses: {
       200: {
         description: 'A list of schedule slots',
@@ -131,6 +132,7 @@ scheduleSlotRoutes.openapi(
     request: {
       params: scheduleSlotIdParamSchema,
     },
+    security: [{ bearerAuth: [] }],
     responses: {
       200: {
         description: 'The requested slot',
@@ -181,6 +183,7 @@ scheduleSlotRoutes.openapi(
         required: true,
       },
     },
+    security: [{ bearerAuth: [] }],
     responses: {
       201: {
         description: 'Slot created',
@@ -227,6 +230,7 @@ scheduleSlotRoutes.openapi(
         required: true,
       },
     },
+    security: [{ bearerAuth: [] }],
     responses: {
       200: {
         description: 'Updated slot',
@@ -320,6 +324,7 @@ scheduleSlotRoutes.openapi(
     request: {
       params: scheduleSlotIdParamSchema,
     },
+    security: [{ bearerAuth: [] }],
     responses: {
       200: {
         description: 'Deleted slot',

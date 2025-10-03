@@ -74,6 +74,7 @@ scheduleRoutes.openapi(
     path: '/',
     tags: ['Event Schedules'],
     summary: 'List event schedules',
+    security: [{ bearerAuth: [] }],
     responses: {
       200: {
         description: 'A list of event schedules',
@@ -100,6 +101,7 @@ scheduleRoutes.openapi(
     request: {
       params: scheduleIdParamSchema,
     },
+    security: [{ bearerAuth: [] }],
     responses: {
       200: {
         description: 'The requested schedule',
@@ -150,6 +152,7 @@ scheduleRoutes.openapi(
         required: true,
       },
     },
+    security: [{ bearerAuth: [] }],
     responses: {
       201: {
         description: 'Schedule created',
@@ -194,6 +197,7 @@ scheduleRoutes.openapi(
         required: true,
       },
     },
+    security: [{ bearerAuth: [] }],
     responses: {
       200: {
         description: 'Updated schedule',
@@ -268,6 +272,7 @@ scheduleRoutes.openapi(
     request: {
       params: scheduleIdParamSchema,
     },
+    security: [{ bearerAuth: [] }],
     responses: {
       200: {
         description: 'Deleted schedule',

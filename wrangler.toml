@@ -2,5 +2,7 @@ name = "event-planner-api"
 main = "src/index.ts"
 compatibility_date = "2024-08-01"
 
-# DATABASE_URL should be set as an encrypted secret:
+# Set the following secrets before deploying:
 #   wrangler secret put DATABASE_URL
+#   wrangler secret put ACCESS_TOKEN_SECRET
+#   wrangler secret put REFRESH_TOKEN_SECRET
