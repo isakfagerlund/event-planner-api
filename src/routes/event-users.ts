@@ -44,6 +44,7 @@ eventUserRoutes.openapi(
     path: '/',
     tags: ['Event Memberships'],
     summary: 'List event memberships',
+    security: [{ bearerAuth: [] }],
     responses: {
       200: {
         description: 'A list of event memberships',
@@ -70,6 +71,7 @@ eventUserRoutes.openapi(
     request: {
       params: eventUserParamSchema,
     },
+    security: [{ bearerAuth: [] }],
     responses: {
       200: {
         description: 'The requested membership',
@@ -120,6 +122,7 @@ eventUserRoutes.openapi(
         required: true,
       },
     },
+    security: [{ bearerAuth: [] }],
     responses: {
       201: {
         description: 'Membership created',
@@ -163,6 +166,7 @@ eventUserRoutes.openapi(
         required: true,
       },
     },
+    security: [{ bearerAuth: [] }],
     responses: {
       200: {
         description: 'Updated membership',
@@ -209,6 +213,7 @@ eventUserRoutes.openapi(
     request: {
       params: eventUserParamSchema,
     },
+    security: [{ bearerAuth: [] }],
     responses: {
       200: {
         description: 'Deleted membership',

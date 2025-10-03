@@ -56,6 +56,7 @@ shoppingListRoutes.openapi(
     path: '/',
     tags: ['Shopping Lists'],
     summary: 'List shopping lists',
+    security: [{ bearerAuth: [] }],
     responses: {
       200: {
         description: 'A list of shopping lists',
@@ -82,6 +83,7 @@ shoppingListRoutes.openapi(
     request: {
       params: shoppingListIdParamSchema,
     },
+    security: [{ bearerAuth: [] }],
     responses: {
       200: {
         description: 'The requested shopping list',
@@ -129,6 +131,7 @@ shoppingListRoutes.openapi(
         required: true,
       },
     },
+    security: [{ bearerAuth: [] }],
     responses: {
       201: {
         description: 'Shopping list created',
@@ -172,6 +175,7 @@ shoppingListRoutes.openapi(
         required: true,
       },
     },
+    security: [{ bearerAuth: [] }],
     responses: {
       200: {
         description: 'Updated shopping list',
@@ -242,6 +246,7 @@ shoppingListRoutes.openapi(
     request: {
       params: shoppingListIdParamSchema,
     },
+    security: [{ bearerAuth: [] }],
     responses: {
       200: {
         description: 'Deleted shopping list',

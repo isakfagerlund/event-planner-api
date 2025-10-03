@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, integer, date, primaryKey } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, integer, date, primaryKey, uniqueIndex } from 'drizzle-orm/pg-core';
 
 export const events = pgTable('events', {
   id: text().primaryKey().notNull(),
@@ -18,13 +18,34 @@ export const users = pgTable('users', {
   id: text().primaryKey().notNull(),
   email: text().notNull(),
   displayName: text('display_name'),
+  passwordHash: text('password_hash')
+    .notNull()
+    .default('pbkdf2$100000$legacy$legacy'),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
     .defaultNow()
     .notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' })
     .defaultNow()
     .notNull(),
-});
+}, (table) => ({
+  emailUnique: uniqueIndex('users_email_unique').on(table.email),
+}));
+
+export const userRefreshTokens = pgTable('user_refresh_tokens', {
+  id: text().primaryKey().notNull(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  tokenHash: text('token_hash').notNull(),
+  expiresAt: timestamp('expires_at', { withTimezone: true, mode: 'string' }).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
+    .defaultNow()
+    .notNull(),
+  lastUsedAt: timestamp('last_used_at', { withTimezone: true, mode: 'string' }),
+  revokedAt: timestamp('revoked_at', { withTimezone: true, mode: 'string' }),
+}, (table) => ({
+  tokenHashUnique: uniqueIndex('user_refresh_tokens_token_hash_unique').on(table.tokenHash),
+}));
 
 export const eventUsers = pgTable(
   'event_users',

@@ -78,6 +78,7 @@ eventRoutes.openapi(
     path: '/',
     tags: ['Events'],
     summary: 'List events',
+    security: [{ bearerAuth: [] }],
     responses: {
       200: {
         description: 'A list of events',
@@ -104,6 +105,7 @@ eventRoutes.openapi(
     request: {
       params: eventIdParamSchema,
     },
+    security: [{ bearerAuth: [] }],
     responses: {
       200: {
         description: 'The requested event',
@@ -151,6 +153,7 @@ eventRoutes.openapi(
         required: true,
       },
     },
+    security: [{ bearerAuth: [] }],
     responses: {
       201: {
         description: 'Event created',
@@ -200,6 +203,7 @@ eventRoutes.openapi(
         required: true,
       },
     },
+    security: [{ bearerAuth: [] }],
     responses: {
       200: {
         description: 'Updated event',
@@ -246,6 +250,7 @@ eventRoutes.openapi(
     request: {
       params: eventIdParamSchema,
     },
+    security: [{ bearerAuth: [] }],
     responses: {
       200: {
         description: 'Deleted event',

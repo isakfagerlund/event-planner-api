@@ -7,6 +7,7 @@ import {
   events,
   shoppingListItems,
   shoppingLists,
+  userRefreshTokens,
   users,
 } from './schema';
 
@@ -19,6 +20,14 @@ export const eventsRelations = relations(events, ({ many }) => ({
 export const usersRelations = relations(users, ({ many }) => ({
   memberships: many(eventUsers),
   ownedScheduleSlots: many(eventScheduleSlots),
+  refreshTokens: many(userRefreshTokens),
+}));
+
+export const userRefreshTokensRelations = relations(userRefreshTokens, ({ one }) => ({
+  user: one(users, {
+    fields: [userRefreshTokens.userId],
+    references: [users.id],
+  }),
 }));
 
 export const eventUsersRelations = relations(eventUsers, ({ one }) => ({

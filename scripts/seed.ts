@@ -9,8 +9,10 @@ import {
   events,
   shoppingListItems,
   shoppingLists,
+  userRefreshTokens,
   users,
 } from '../drizzle/schema';
+import { hashPassword } from '../src/auth/password';
 
 const db = drizzle(process.env.DATABASE_URL!);
 
@@ -26,13 +28,21 @@ const main = async () => {
   await db.delete(shoppingLists);
   await db.delete(eventUsers);
   await db.delete(events);
+  await db.delete(userRefreshTokens);
   await db.delete(users);
+
+  const [alicePassword, bobPassword, chrisPassword] = await Promise.all([
+    hashPassword('Password123!'),
+    hashPassword('Password123!'),
+    hashPassword('Password123!'),
+  ]);
 
   const userData = [
     {
       id: 'usr_alice',
       email: 'alice@example.com',
       displayName: 'Alice Organizer',
+      passwordHash: alicePassword,
       createdAt: iso('2024-07-01T09:00:00Z'),
       updatedAt: iso('2024-07-01T09:00:00Z'),
     },
@@ -40,6 +50,7 @@ const main = async () => {
       id: 'usr_bob',
       email: 'bob@example.com',
       displayName: 'Bob Coordinator',
+      passwordHash: bobPassword,
       createdAt: iso('2024-07-01T09:30:00Z'),
       updatedAt: iso('2024-07-01T09:30:00Z'),
     },
@@ -47,6 +58,7 @@ const main = async () => {
       id: 'usr_chris',
       email: 'chris@example.com',
       displayName: 'Chris Volunteer',
+      passwordHash: chrisPassword,
       createdAt: iso('2024-07-01T10:00:00Z'),
       updatedAt: iso('2024-07-01T10:00:00Z'),
     },
