@@ -1,9 +1,9 @@
 import { OpenAPIHono, createRoute, z } from '@hono/zod-openapi';
 import { eq } from 'drizzle-orm';
 
-import { db } from '../db/client';
 import { events } from '../../drizzle/schema';
 import { errorSchema, timestampExample } from './schemas/common';
+import type { AppEnv } from '../env';
 
 const eventSchema = z
   .object({
@@ -70,7 +70,7 @@ const eventIdParamSchema = z
   })
   .openapi('EventIdParams');
 
-export const eventRoutes = new OpenAPIHono();
+export const eventRoutes = new OpenAPIHono<AppEnv>();
 
 eventRoutes.openapi(
   createRoute({
@@ -90,7 +90,7 @@ eventRoutes.openapi(
     },
   }),
   async (c) => {
-    const allEvents = await db.select().from(events);
+    const allEvents = await c.var.db.select().from(events);
     return c.json(allEvents, 200);
   }
 );
@@ -125,7 +125,7 @@ eventRoutes.openapi(
   }),
   async (c) => {
     const { id: eventId } = c.req.valid('param');
-    const [event] = await db.select().from(events).where(eq(events.id, eventId));
+    const [event] = await c.var.db.select().from(events).where(eq(events.id, eventId));
 
     if (!event) {
       return c.json({ message: 'Event not found' }, 404);
@@ -173,7 +173,7 @@ eventRoutes.openapi(
   async (c) => {
     const body = c.req.valid('json');
 
-    const [createdEvent] = await db.insert(events).values(body).returning();
+    const [createdEvent] = await c.var.db.insert(events).values(body).returning();
 
     if (!createdEvent) {
       return c.json({ message: 'Unable to create event' }, 500);
@@ -223,7 +223,7 @@ eventRoutes.openapi(
     const { id: eventId } = c.req.valid('param');
     const body = c.req.valid('json');
 
-    const [updatedEvent] = await db
+    const [updatedEvent] = await c.var.db
       .update(events)
       .set({ ...body, updatedAt: new Date().toISOString() })
       .where(eq(events.id, eventId))
@@ -268,7 +268,7 @@ eventRoutes.openapi(
   async (c) => {
     const { id: eventId } = c.req.valid('param');
 
-    const [deletedEvent] = await db
+    const [deletedEvent] = await c.var.db
       .delete(events)
       .where(eq(events.id, eventId))
       .returning();

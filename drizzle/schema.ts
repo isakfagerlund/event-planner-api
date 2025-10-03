@@ -1,5 +1,4 @@
 import { pgTable, text, timestamp, integer, date, primaryKey } from 'drizzle-orm/pg-core';
-import { createSelectSchema } from 'drizzle-zod';
 
 export const events = pgTable('events', {
   id: text().primaryKey().notNull(),
@@ -15,8 +14,6 @@ export const events = pgTable('events', {
     .notNull(),
 });
 
-export const eventsSelectSchema = createSelectSchema(events);
-
 export const users = pgTable('users', {
   id: text().primaryKey().notNull(),
   email: text().notNull(),
@@ -28,8 +25,6 @@ export const users = pgTable('users', {
     .defaultNow()
     .notNull(),
 });
-
-export const usersSelectSchema = createSelectSchema(users);
 
 export const eventUsers = pgTable(
   'event_users',
@@ -53,8 +48,6 @@ export const eventUsers = pgTable(
   })
 );
 
-export const eventUsersSelectSchema = createSelectSchema(eventUsers);
-
 export const shoppingLists = pgTable('shopping_lists', {
   id: text().primaryKey().notNull(),
   eventId: text('event_id')
@@ -69,8 +62,6 @@ export const shoppingLists = pgTable('shopping_lists', {
     .defaultNow()
     .notNull(),
 });
-
-export const shoppingListsSelectSchema = createSelectSchema(shoppingLists);
 
 export const shoppingListItems = pgTable('shopping_list_items', {
   id: text().primaryKey().notNull(),
@@ -89,8 +80,6 @@ export const shoppingListItems = pgTable('shopping_list_items', {
     .notNull(),
 });
 
-export const shoppingListItemsSelectSchema = createSelectSchema(shoppingListItems);
-
 export const eventSchedules = pgTable('event_schedules', {
   id: text().primaryKey().notNull(),
   eventId: text('event_id')
@@ -106,8 +95,6 @@ export const eventSchedules = pgTable('event_schedules', {
     .defaultNow()
     .notNull(),
 });
-
-export const eventSchedulesSelectSchema = createSelectSchema(eventSchedules);
 
 export const eventScheduleSlots = pgTable('event_schedule_slots', {
   id: text().primaryKey().notNull(),
@@ -127,5 +114,3 @@ export const eventScheduleSlots = pgTable('event_schedule_slots', {
     .defaultNow()
     .notNull(),
 });
-
-export const eventScheduleSlotsSelectSchema = createSelectSchema(eventScheduleSlots);

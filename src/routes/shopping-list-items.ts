@@ -1,9 +1,9 @@
 import { OpenAPIHono, createRoute, z } from '@hono/zod-openapi';
 import { eq } from 'drizzle-orm';
 
-import { db } from '../db/client';
 import { shoppingListItems } from '../../drizzle/schema';
 import { errorSchema, timestampExample } from './schemas/common';
+import type { AppEnv } from '../env';
 
 const itemStatusEnum = z.enum(['pending', 'in-progress', 'completed']);
 
@@ -72,7 +72,7 @@ const shoppingListItemIdParamSchema = z
   })
   .openapi('ShoppingListItemIdParams');
 
-export const shoppingListItemRoutes = new OpenAPIHono();
+export const shoppingListItemRoutes = new OpenAPIHono<AppEnv>();
 
 shoppingListItemRoutes.openapi(
   createRoute({
@@ -92,7 +92,7 @@ shoppingListItemRoutes.openapi(
     },
   }),
   async (c) => {
-    const items = await db.select().from(shoppingListItems);
+    const items = await c.var.db.select().from(shoppingListItems);
     return c.json(items, 200);
   }
 );
@@ -127,7 +127,7 @@ shoppingListItemRoutes.openapi(
   }),
   async (c) => {
     const { id: itemId } = c.req.valid('param');
-    const [item] = await db
+    const [item] = await c.var.db
       .select()
       .from(shoppingListItems)
       .where(eq(shoppingListItems.id, itemId));
@@ -170,7 +170,7 @@ shoppingListItemRoutes.openapi(
   async (c) => {
     const body = c.req.valid('json');
 
-    const [createdItem] = await db
+    const [createdItem] = await c.var.db
       .insert(shoppingListItems)
       .values({
         ...body,
@@ -261,7 +261,7 @@ shoppingListItemRoutes.openapi(
       updateData.neededBy = body.neededBy;
     }
 
-    const [updatedItem] = await db
+    const [updatedItem] = await c.var.db
       .update(shoppingListItems)
       .set(updateData)
       .where(eq(shoppingListItems.id, itemId))
@@ -306,7 +306,7 @@ shoppingListItemRoutes.openapi(
   async (c) => {
     const { id: itemId } = c.req.valid('param');
 
-    const [deletedItem] = await db
+    const [deletedItem] = await c.var.db
       .delete(shoppingListItems)
       .where(eq(shoppingListItems.id, itemId))
       .returning();

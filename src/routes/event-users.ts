@@ -1,9 +1,9 @@
 import { OpenAPIHono, createRoute, z } from '@hono/zod-openapi';
 import { and, eq } from 'drizzle-orm';
 
-import { db } from '../db/client';
 import { eventUsers } from '../../drizzle/schema';
 import { errorSchema, timestampExample } from './schemas/common';
+import type { AppEnv } from '../env';
 
 const eventUserSchema = z
   .object({
@@ -36,7 +36,7 @@ const eventUserParamSchema = z
   })
   .openapi('EventUserParams');
 
-export const eventUserRoutes = new OpenAPIHono();
+export const eventUserRoutes = new OpenAPIHono<AppEnv>();
 
 eventUserRoutes.openapi(
   createRoute({
@@ -56,7 +56,7 @@ eventUserRoutes.openapi(
     },
   }),
   async (c) => {
-    const memberships = await db.select().from(eventUsers);
+    const memberships = await c.var.db.select().from(eventUsers);
     return c.json(memberships, 200);
   }
 );
@@ -91,7 +91,7 @@ eventUserRoutes.openapi(
   }),
   async (c) => {
     const { eventId, userId } = c.req.valid('param');
-    const [membership] = await db
+    const [membership] = await c.var.db
       .select()
       .from(eventUsers)
       .where(and(eq(eventUsers.eventId, eventId), eq(eventUsers.userId, userId)));
@@ -134,7 +134,7 @@ eventUserRoutes.openapi(
   async (c) => {
     const body = c.req.valid('json');
 
-    const [createdMembership] = await db
+    const [createdMembership] = await c.var.db
       .insert(eventUsers)
       .values({
         ...body,
@@ -186,7 +186,7 @@ eventUserRoutes.openapi(
     const { eventId, userId } = c.req.valid('param');
     const body = c.req.valid('json');
 
-    const [updatedMembership] = await db
+    const [updatedMembership] = await c.var.db
       .update(eventUsers)
       .set({ role: body.role, updatedAt: new Date().toISOString() })
       .where(and(eq(eventUsers.eventId, eventId), eq(eventUsers.userId, userId)))
@@ -231,7 +231,7 @@ eventUserRoutes.openapi(
   async (c) => {
     const { eventId, userId } = c.req.valid('param');
 
-    const [deletedMembership] = await db
+    const [deletedMembership] = await c.var.db
       .delete(eventUsers)
       .where(and(eq(eventUsers.eventId, eventId), eq(eventUsers.userId, userId)))
       .returning();

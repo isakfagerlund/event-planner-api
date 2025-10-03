@@ -1,9 +1,9 @@
 import { OpenAPIHono, createRoute, z } from '@hono/zod-openapi';
 import { eq } from 'drizzle-orm';
 
-import { db } from '../db/client';
 import { eventSchedules } from '../../drizzle/schema';
 import { errorSchema, timestampExample } from './schemas/common';
+import type { AppEnv } from '../env';
 
 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -66,7 +66,7 @@ const scheduleIdParamSchema = z
   })
   .openapi('EventScheduleIdParams');
 
-export const scheduleRoutes = new OpenAPIHono();
+export const scheduleRoutes = new OpenAPIHono<AppEnv>();
 
 scheduleRoutes.openapi(
   createRoute({
@@ -86,7 +86,7 @@ scheduleRoutes.openapi(
     },
   }),
   async (c) => {
-    const schedules = await db.select().from(eventSchedules);
+    const schedules = await c.var.db.select().from(eventSchedules);
     return c.json(schedules, 200);
   }
 );
@@ -121,7 +121,10 @@ scheduleRoutes.openapi(
   }),
   async (c) => {
     const { id: scheduleId } = c.req.valid('param');
-    const [schedule] = await db.select().from(eventSchedules).where(eq(eventSchedules.id, scheduleId));
+    const [schedule] = await c.var.db
+      .select()
+      .from(eventSchedules)
+      .where(eq(eventSchedules.id, scheduleId));
 
     if (!schedule) {
       return c.json({ message: 'Schedule not found' }, 404);
@@ -161,7 +164,7 @@ scheduleRoutes.openapi(
   async (c) => {
     const body = c.req.valid('json');
 
-    const [createdSchedule] = await db
+    const [createdSchedule] = await c.var.db
       .insert(eventSchedules)
       .values({
         ...body,
@@ -242,7 +245,7 @@ scheduleRoutes.openapi(
       updateData.day = body.day;
     }
 
-    const [updatedSchedule] = await db
+    const [updatedSchedule] = await c.var.db
       .update(eventSchedules)
       .set(updateData)
       .where(eq(eventSchedules.id, scheduleId))
@@ -287,7 +290,7 @@ scheduleRoutes.openapi(
   async (c) => {
     const { id: scheduleId } = c.req.valid('param');
 
-    const [deletedSchedule] = await db
+    const [deletedSchedule] = await c.var.db
       .delete(eventSchedules)
       .where(eq(eventSchedules.id, scheduleId))
       .returning();

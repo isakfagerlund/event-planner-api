@@ -1,9 +1,9 @@
 import { OpenAPIHono, createRoute, z } from '@hono/zod-openapi';
 import { eq } from 'drizzle-orm';
 
-import { db } from '../db/client';
 import { eventScheduleSlots } from '../../drizzle/schema';
 import { errorSchema, timestampExample } from './schemas/common';
+import type { AppEnv } from '../env';
 
 const scheduleSlotSchema = z
   .object({
@@ -97,7 +97,7 @@ const scheduleSlotIdParamSchema = z
   })
   .openapi('EventScheduleSlotIdParams');
 
-export const scheduleSlotRoutes = new OpenAPIHono();
+export const scheduleSlotRoutes = new OpenAPIHono<AppEnv>();
 
 scheduleSlotRoutes.openapi(
   createRoute({
@@ -117,7 +117,7 @@ scheduleSlotRoutes.openapi(
     },
   }),
   async (c) => {
-    const slots = await db.select().from(eventScheduleSlots);
+    const slots = await c.var.db.select().from(eventScheduleSlots);
     return c.json(slots, 200);
   }
 );
@@ -152,7 +152,7 @@ scheduleSlotRoutes.openapi(
   }),
   async (c) => {
     const { id: slotId } = c.req.valid('param');
-    const [slot] = await db
+    const [slot] = await c.var.db
       .select()
       .from(eventScheduleSlots)
       .where(eq(eventScheduleSlots.id, slotId));
@@ -195,7 +195,7 @@ scheduleSlotRoutes.openapi(
   async (c) => {
     const body = c.req.valid('json');
 
-    const [createdSlot] = await db
+    const [createdSlot] = await c.var.db
       .insert(eventScheduleSlots)
       .values({
         ...body,
@@ -297,7 +297,7 @@ scheduleSlotRoutes.openapi(
       updateData.notes = body.notes;
     }
 
-    const [updatedSlot] = await db
+    const [updatedSlot] = await c.var.db
       .update(eventScheduleSlots)
       .set(updateData)
       .where(eq(eventScheduleSlots.id, slotId))
@@ -342,7 +342,7 @@ scheduleSlotRoutes.openapi(
   async (c) => {
     const { id: slotId } = c.req.valid('param');
 
-    const [deletedSlot] = await db
+    const [deletedSlot] = await c.var.db
       .delete(eventScheduleSlots)
       .where(eq(eventScheduleSlots.id, slotId))
       .returning();

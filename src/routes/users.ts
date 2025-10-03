@@ -1,9 +1,9 @@
 import { OpenAPIHono, createRoute, z } from '@hono/zod-openapi';
 import { eq } from 'drizzle-orm';
 
-import { db } from '../db/client';
 import { users } from '../../drizzle/schema';
 import { errorSchema, timestampExample } from './schemas/common';
+import type { AppEnv } from '../env';
 
 const userSchema = z
   .object({
@@ -47,7 +47,7 @@ const userIdParamSchema = z
   })
   .openapi('UserIdParams');
 
-export const userRoutes = new OpenAPIHono();
+export const userRoutes = new OpenAPIHono<AppEnv>();
 
 userRoutes.openapi(
   createRoute({
@@ -67,7 +67,7 @@ userRoutes.openapi(
     },
   }),
   async (c) => {
-    const allUsers = await db.select().from(users);
+    const allUsers = await c.var.db.select().from(users);
     return c.json(allUsers, 200);
   }
 );
@@ -102,7 +102,7 @@ userRoutes.openapi(
   }),
   async (c) => {
     const { id: userId } = c.req.valid('param');
-    const [user] = await db.select().from(users).where(eq(users.id, userId));
+    const [user] = await c.var.db.select().from(users).where(eq(users.id, userId));
 
     if (!user) {
       return c.json({ message: 'User not found' }, 404);
@@ -142,7 +142,7 @@ userRoutes.openapi(
   async (c) => {
     const body = c.req.valid('json');
 
-    const [createdUser] = await db
+    const [createdUser] = await c.var.db
       .insert(users)
       .values({
         ...body,
@@ -218,7 +218,7 @@ userRoutes.openapi(
       updateData.displayName = body.displayName;
     }
 
-    const [updatedUser] = await db
+    const [updatedUser] = await c.var.db
       .update(users)
       .set(updateData)
       .where(eq(users.id, userId))
@@ -263,7 +263,7 @@ userRoutes.openapi(
   async (c) => {
     const { id: userId } = c.req.valid('param');
 
-    const [deletedUser] = await db.delete(users).where(eq(users.id, userId)).returning();
+    const [deletedUser] = await c.var.db.delete(users).where(eq(users.id, userId)).returning();
 
     if (!deletedUser) {
       return c.json({ message: 'User not found' }, 404);

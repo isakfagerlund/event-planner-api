@@ -1,9 +1,9 @@
 import { OpenAPIHono, createRoute, z } from '@hono/zod-openapi';
 import { eq } from 'drizzle-orm';
 
-import { db } from '../db/client';
 import { shoppingLists } from '../../drizzle/schema';
 import { errorSchema, timestampExample } from './schemas/common';
+import type { AppEnv } from '../env';
 
 const shoppingListSchema = z
   .object({
@@ -48,7 +48,7 @@ const shoppingListIdParamSchema = z
   })
   .openapi('ShoppingListIdParams');
 
-export const shoppingListRoutes = new OpenAPIHono();
+export const shoppingListRoutes = new OpenAPIHono<AppEnv>();
 
 shoppingListRoutes.openapi(
   createRoute({
@@ -68,7 +68,7 @@ shoppingListRoutes.openapi(
     },
   }),
   async (c) => {
-    const lists = await db.select().from(shoppingLists);
+    const lists = await c.var.db.select().from(shoppingLists);
     return c.json(lists, 200);
   }
 );
@@ -103,7 +103,7 @@ shoppingListRoutes.openapi(
   }),
   async (c) => {
     const { id: listId } = c.req.valid('param');
-    const [list] = await db.select().from(shoppingLists).where(eq(shoppingLists.id, listId));
+    const [list] = await c.var.db.select().from(shoppingLists).where(eq(shoppingLists.id, listId));
 
     if (!list) {
       return c.json({ message: 'Shopping list not found' }, 404);
@@ -143,7 +143,7 @@ shoppingListRoutes.openapi(
   async (c) => {
     const body = c.req.valid('json');
 
-    const [createdList] = await db
+    const [createdList] = await c.var.db
       .insert(shoppingLists)
       .values({
         ...body,
@@ -219,7 +219,7 @@ shoppingListRoutes.openapi(
       updateData.notes = body.notes;
     }
 
-    const [updatedList] = await db
+    const [updatedList] = await c.var.db
       .update(shoppingLists)
       .set(updateData)
       .where(eq(shoppingLists.id, listId))
@@ -264,7 +264,7 @@ shoppingListRoutes.openapi(
   async (c) => {
     const { id: listId } = c.req.valid('param');
 
-    const [deletedList] = await db
+    const [deletedList] = await c.var.db
       .delete(shoppingLists)
       .where(eq(shoppingLists.id, listId))
       .returning();
